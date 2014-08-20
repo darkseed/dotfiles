@@ -720,6 +720,12 @@ alias trash-look="ls -al $TRASHDIR/ 2> /dev/null"
 alias trash-clean="/bin/rm -R -f $TRASHDIR/*"
 alias clean=trash-clean
 
+function server {
+  local port="${1-8000}"
+  python -m SimpleHTTPServer ${port}
+  open "http://localhost:${port}"
+}
+
 #  Fuzzy search & open in vim
 #-----------------------------------------------
 function agvim () {
