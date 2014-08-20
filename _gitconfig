@@ -1,0 +1,106 @@
+[user]
+  name = Tom Mulder
+  email = mulder.tom@gmail.com
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
+  ui = auto
+[gc]
+  auto = 1
+[merge]
+  summary = true
+  conflictstyle = diff3
+  tool = diffmerge
+[alias]
+  # The basics.
+  st = status
+
+  ci = commit
+  co = checkout
+
+  br = branch
+
+  h = help
+  sub = submodule
+  unstash = "stash pop"
+  dst = "diff --staged"
+  dc = "!git diff | cdiff -s"
+  dcs = "!git diff --staged | cdiff -s"
+  cp = "cherry-pick"
+
+  f = flow
+  fs = flow feature start
+  ff = flow feature finish
+  fl = flow feature list
+  rs = flow release start
+  rf = flow release finish
+  xs = flow hotfix start
+  xf = flow hotfix finish
+  xl = flow hotfix list
+
+  tags = tag -l
+  branches = branch -a
+  remotes = remote -v
+
+  d = diff                                # show changes in the working directory (not including index)
+  ds = diff --staged                      # show changes in the index only (not working directory)
+
+  unstage = reset HEAD                    # un-add files from index (tracking)
+  uncommit = reset --soft HEAD^           # go back one commit, put changes into your working dir and index
+  chunkyadd = add --patch                 # stage commits chunk by chunk
+  amend = commit --amend                  # fix last commit
+  ammend = commit --amend                 # for those who can't spell :-)
+  
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  lline = log --oneline -10
+  gl1 = log -1 --name-status
+
+  res  = reset --soft HEAD
+  res1 = reset --soft HEAD~
+  res2 = reset --soft HEAD~~
+  res3 = reset --soft HEAD~~~
+  res4 = reset --soft HEAD~~~~
+  res5 = reset --soft HEAD~~~~~
+  reh  = reset --hard HEAD
+  reh1 = reset --hard HEAD~
+  reh2 = reset --hard HEAD~~
+  reh3 = reset --hard HEAD~~~
+  reh4 = reset --hard HEAD~~~~
+  reh5 = reset --hard HEAD~~~~~
+
+  pr = "!f() { git fetch origin pull/$1/head:pr/$1; }; f"
+  pl = "!f() { git symbolic-ref --short HEAD ; }; git pull origin `f`"
+  pu = "!f() { git symbolic-ref --short HEAD ; }; git push origin `f`"
+
+  e = "!f() { git status -s | cut -b 4- | grep -v '\\/$' | uniq ; }; vim `f`"
+  edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`"
+  add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+  delete-unmerged =  "!f() { git ls-files --deleted | cut -f2 | sort -u ; }; git rm `f`"
+  modified = "!f() { git diff $1..$1\\^ --name-only | xargs sh -c 'vim "$@" < /dev/tty' - ;}; f"
+
+  # Remove branches that have already been merged with master
+  dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+
+[credential]
+  helper = cache
+[rerere]
+  enabled = true
+[branch]
+  autosetuprebase = always
+[pull]
+  rebase = true
+[push]
+  default = upstream
+[core]
+  autocrlf = input
+  excludesfile = ~/.gitignore_global
+
+[issue]
+  type = github
+[mergetool "diffmerge"]
+  cmd = diffmerge --merge --result=$MERGED $LOCAL $BASE $REMOTE
+  trustExitCode = true
+[mergetool]
+	keepBackup = false

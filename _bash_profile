@@ -1,0 +1,79 @@
+# No fancy prompts for non interactive shells
+[ -z "$PS1" ] && return
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# History -------------------------------
+# append to the history file, don't overwrite it
+shopt -s histappend
+export HISTCONTROL=ignoredups
+export HISTFILESIZE=3000
+export HISTIGNORE="ls:cd:[bf]g:exit:..:...:ll:lla:l"
+alias h=history
+hf(){
+    grep "$@" ~/.bash_history
+}
+
+# Check window size and changes to the window size
+shopt -s checkwinsize
+
+# disable the shell bell
+bind "set bell-style none"
+
+# Editors
+export EDITOR='vim' #Command line
+export GIT_EDITOR='vim'
+
+# disable <C-S><C-Q>
+stty -ixon -ixoff
+# disable <C-Z>
+stty susp undef
+
+# Add this to your cron to restart the ssh-agent on a reboot.
+# @reboot ssh-agent -s | grep -v echo > $HOME/.ssh-agent
+#
+# And start this once manually
+# ssh-agent -s | grep -v echo > $HOME/.ssh-agent
+if [[ -f ~/.ssh-agent ]]; then
+    source $HOME/.ssh-agent
+fi
+
+
+#source ~/.bashrc.functions
+#source ~/.bashrc.completion
+#source ~/.bashrc.exports
+#source ~/.bashrc.aliases
+for incl in functions exports aliases; do
+    . ~/.bashrc.$incl
+done
+
+# vitualenv
+venwrap=`type -P virtualenvwrapper.sh`
+if [ "$venwrap" != "" ]; then
+    source $venwrap
+fi
+
+if [ -f ~/.bashrc.local ]; then
+    source ~/.bashrc.local
+fi
+
+
+# Bash completion
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+   . $(brew --prefix)/etc/bash_completion
+fi
+
+# Powerline shell
+if [ -f /usr/local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh ]; then
+    . /usr/local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh
+fi
+
+#PYTHONPATH=$(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
+#POWERLINESH=$PYTHONPATH/powerline/bindings/bash/powerline.sh
+#if [ -f $POWERLINESH ]; then
+#    source $POWERLINESH
+#fi
+

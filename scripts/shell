@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -f /usr/local/bin/bash ]; then
+  echo "Changing login shell..."
+
+  echo "/usr/local/bin/bash" | sudo tee -a /etc/shells
+
+  chpass -s /usr/local/bin/bash
+
+  echo "ok"
+fi

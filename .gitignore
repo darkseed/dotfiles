@@ -1,0 +1,7 @@
+.DS_Store
+_vim/sessions/*
+_vim/bundle/*
+_vim/tmp/*
+!_vim/bundle/neobundle.vim
+_vim/.netrwhist
+!.gitkeep

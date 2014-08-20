@@ -1,0 +1,750 @@
+# Collection of functions and shortcuts created over the years
+
+# Sluething----------------------------------------------------
+findportuser() {
+    lsof -i :"$1"
+}
+
+# functions taken from http://github.com/twerth/dotfiles/blob/master/etc/bashrc_app_specific
+gtcommit(){
+    gt commit -m "$@"
+}
+
+gtcommitall(){
+    gt commit -a -v -m "$@"
+}
+
+gtpushorigin(){
+    gt push origin $@
+}
+
+gtcheckout (){
+    gt checkout $1
+    gt branch
+}
+
+gtcheckouttrackingbranch (){
+    gt checkout -tlb $1 origin/$1
+    gt branch
+}
+
+gtlogforuser(){
+    gtlog --author=$1
+}
+gtloggrep(){
+    gtlog | grep $@ -B20 -A20
+}
+gtgrep(){
+    gt grep -e "$@" | highlight green "$@" blue "^.*\:"
+}
+
+gitfilter() {
+    CMD=echo $1 | sed "s/\([[:print:]]*\)/\"\1\"/"
+    echo $CMD
+    git filter-branch --tree-filter $CMD HEAD
+}
+gitdeletehistory() {
+    echo "removing .git directory"
+    rm -rf .git
+    echo "git init"
+    git init
+    echo "git add ."
+    git add .
+    echo "git commit -m 'Initial commit'"
+    git commit -m "Initial commit"
+    echo "git remote add origin" $1
+    git remote add origin $1
+    echo "git push -u --force origin master"
+    git push -u --force origin master
+}
+
+
+function ii(){
+    NET=`netstat -rn | egrep UG | grep 0\.0\.0\.0 | awk '{print $8;}'`
+#    clear
+    echo -e "\n${COLOR_RED}You are logged on $COLOR_NC$HOSTNAME"
+    echo -e "\n${COLOR_RED}Additional information:$COLOR_NC " ; uname -a
+    echo -e "\n${COLOR_RED}Users logged on:$COLOR_NC " ; w -h
+    echo -e "\n${COLOR_RED}Current date :$COLOR_NC " ; date
+    echo -e "\n${COLOR_RED}Machine stats :$COLOR_NC " ; uptime
+    echo -e "\n${COLOR_RED}Memory stats :$COLOR_NC " ; free
+    echo -e "\n${COLOR_RED}Disk usage :$COLOR_NC " ; df -lh
+    echo -e "\n${COLOR_RED}Local IP Address :$COLOR_NC" ;
+    for iface in $NET; do
+        echo -e "${COLOR_RED}$iface :$COLOR_NC\t `/sbin/ifconfig $iface | awk '/inet/ { print $2 } ' | sed -e s/addr://`"
+    done
+#    echo -e "----------------------------------------------------------------------\n"
+}
+
+# Find a file with a pattern in name:
+function ff() { find . -type f -iname '*'$*'*' -ls ; }
+
+# Find a file with pattern $1 in name and Execute $2 on it:
+function fe() { find . -type f -iname '*'${1:-}'*' -exec ${2:-file} {} \;  ; }
+
+function find_in { find . -name $1 -print | xargs grep --color=auto -inH $2; }
+
+# Find a pattern in a set of files and highlight them:
+# (needs a recent version of egrep)
+function fstr()
+{
+    OPTIND=1
+    local case=""
+    local usage="fstr: find string in files.
+Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+    while getopts :it opt
+    do
+        case "$opt" in
+            i) case="-i " ;;
+            *) echo "$usage"; return;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    if [ "$#" -lt 1 ]; then
+        echo "$usage"
+        return;
+    fi
+    find . -type f -name "${2:-*}" -print0 | \
+    xargs -0 egrep --color=always -sn ${case} "$1" 2>&- | more
+}
+
+function cuttail() # cut last n lines in file, 10 by default
+{
+    nlines=${2:-10}
+    sed -n -e :a -e "1,${nlines}!{P;N;D;};N;ba" $1
+}
+
+function lowercase()  # move filenames to lowercase
+{
+    for file ; do
+        filename=${file##*/}
+        case "$filename" in
+            */*) dirname==${file%/*} ;;
+            *) dirname=.;;
+        esac
+        nf=$(echo $filename | tr A-Z a-z)
+        newname="${dirname}/${nf}"
+        if [ "$nf" != "$filename" ]; then
+            mv "$file" "$newname"
+            echo "lowercase: $file --> $newname"
+        else
+            echo "lowercase: $file not changed."
+        fi
+    done
+}
+
+function swap()  # Swap 2 filenames around, if they exist
+{                #(from Uzi's bashrc).
+    local TMPFILE=tmp.$$
+
+    [ $# -ne 2 ] && echo "swap: 2 arguments needed" && return 1
+    [ ! -e $1 ] && echo "swap: $1 does not exist" && return 1
+    [ ! -e $2 ] && echo "swap: $2 does not exist" && return 1
+
+    mv "$1" $TMPFILE
+    mv "$2" "$1"
+    mv $TMPFILE "$2"
+}
+
+function extract()      # Handy Extract Program.
+{
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xvjf $1     ;;
+            *.tar.gz)    tar xvzf $1     ;;
+            *.bz2)       bunzip2 $1      ;;
+            *.rar)       unrar x $1      ;;
+            *.gz)        gunzip $1       ;;
+            *.tar)       tar xvf $1      ;;
+            *.tbz2)      tar xvjf $1     ;;
+            *.tgz)       tar xvzf $1     ;;
+            *.zip)       unzip $1        ;;
+            *.Z)         uncompress $1   ;;
+            *.7z)        7z x $1         ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+function repeat()       # Repeat n times command.
+{
+    local i max
+    max=$1; shift;
+    for ((i=1; i <= max ; i++)); do  # --> C-like syntax
+        eval "$@";
+    done
+}
+
+function ask()          # See 'killps' for example of use.
+{
+    echo -n "$@" '[y/n] ' ; read ans
+    case "$ans" in
+        y*|Y*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+function corename()   # Get name of app that created a corefile.
+{
+    for file ; do
+        echo -n $file : ; gdb --core=$file --batch | head -1
+    done
+}
+
+function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
+function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
+function killps()                 # Kill by process name.
+{
+    local pid pname sig="-TERM"   # Default signal.
+    if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+        echo "Usage: killps [-SIGNAL] pattern"
+        return;
+    fi
+    if [ $# = 2 ]; then sig=$1 ; fi
+    for pid in $(my_ps| awk '!/awk/ && $0~pat { print $1 }' pat=${!#} ) ; do
+        pname=$(my_ps | awk '$1~var { print $5 }' var=$pid )
+        if ask "Kill process $pid <$pname> with signal $sig?"
+            then kill $sig $pid
+        fi
+    done
+}
+
+function fawk {
+    first="awk '{print "
+        last="}'"
+    cmd="${first}\$${1}${last}"
+    eval $cmd
+}
+
+genpasswd() {
+    local l=$1
+    [ "$l" == "" ] && l=20
+    tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs
+}
+
+locatesite() {
+    local t=$2
+    local s=$1
+    [ "$s" == "" ] echo "Usage: ${0} <sitename> [prod|acc|tst]"; exit 1
+    [ "$t" == "" ] && t="prod"
+}
+
+function puppetskel {
+    if [ $# -ne 2 ]; then
+        echo "Usage: puppetskel <projectname> <projectbasepath>"
+    else
+        if [ -d $2/$1 ]; then
+            echo "Directory $2/$1 already exists"
+        else
+            OLDDIR=`pwd`
+            echo "Creating $2/$1"
+            mkdir -p $2/$1/manifests/classes
+            mkdir $2/$1/manifests/definitions
+            mkdir $2/$1/files
+            mkdir $2/$1/templates
+            echo -e "#import \"definitions/*.pp\"\n#import \"classes/*.pp\"" > $2/$1/manifests/init.pp
+            cd $2/$1 && /usr/bin/git init && git remote add origin git@10.39.16.7:$1.git
+            echo
+            echo "do some work, git add and commit files..."
+            echo "Then push to the remote master repos with 'git push origin master:refs/heads/master'"
+            echo
+        fi
+    fi
+}
+
+function freeram() {
+    if [ $# -lt 1 ]; then
+        echo "Usage ${1} <dsh group>"
+        echo "Example ${1} prod"
+    else
+        if [[ "$2" =~ "-g|-m" ]]; then
+            FREEOPT=$2
+        else
+            FREEOPT="-k"
+        fi
+
+        if [[ "$1" =~ "prod|acc|tst" ]]; then
+            /usr/bin/dsh -g $1 -- free $FREEOPT|grep "Mem:"|awk '{tot=tot+$5} END {printf "%8.2f\n",tot}'
+        else
+            /usr/bin/dsh -a -- free $FREEOPT|grep "Mem:"|awk '{tot=tot+$5} END {printf "%8.2f\n",tot}'
+        fi
+    fi
+}
+
+function findsite() {
+    DSHCMD=/usr/bin/dsh
+
+    if [ $# -lt 1 ]; then
+        echo "Usage ${1} <sitename> [group]"
+        echo "Example ${1} elsevier.nl prod $#"
+    else
+        if [ $# -eq 1 ]; then
+            DSHOPTIONS="-a"
+        else
+            DSHOPTIONS="-g ${2}"
+        fi
+
+        if [[ "$2" =~ "prod|acc|tst" ]]; then
+            $DSHCMD $DSHOPTIONS 'ls /local/vhosts' 2>&1 | grep -v "No such file" | grep ${1}
+        else
+            echo "$2 does not match 'prod', 'acc' or 'tst'"
+        fi
+
+    fi
+}
+
+knock(){
+    ( pn=${2:-10101}
+    dur=${3:-3}
+    nc -w $dur $1 $pn &> /dev/null )&
+}
+
+# remove old host fingerprint
+ssh_delhostkey ()
+{
+    data=( `ssh $1 2>&1 | grep Offending | tr '\r' ' '| sed -e 's/.* in \(.*\):\([0-9]*\)/\1 \2/g'` )
+    sed -i -e "${data[1]}d" "${data[0]}"
+    return 0
+}
+
+parse_git_branch ()
+{
+    git branch 2> /dev/null | grep '*' | sed 's#*\ \(.*\)#(git::\1)#'
+}
+
+parse_svn_branch()
+{
+    parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "(svn::"$1 "/" $2 ")"}'
+}
+
+parse_svn_url()
+{
+    svn info 2>/dev/null | sed -ne 's#^URL: ##p'
+}
+
+parse_svn_repository_root()
+{
+    svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
+}
+
+# inspired by http://tldp.org/HOWTO/Bash-Prompt-HOWTO/x279.html
+# but I made it a single awk instead of an awk, forloop and a bc
+# asumes we have awk available.  but really, who doesnt have awk?
+# let's get the size of the files in this dir
+function lsbytes {
+    echo -n $(ls -l | awk '/^-/{total += $5} END{printf "%.2f", total/1048576}')
+}
+
+# Queue and Stack functions (push, pop, shift, unshift)
+# Sorta craptastic because the array /must/ be named $arr
+# and output always ends up in the variable $placeholder
+#
+# Derived from: http://www.rootninja.com/how-to-push-pop-shift-and-unshift-arrays-in-bash/
+function arr_push() {
+    arr=("${arr[@]}" "$1")
+}
+
+function arr_pop() {
+    local i=$(expr ${#arr[@]} - 1)
+    placeholder=${arr[$i]}
+    unset arr[$i]
+    arr=("${arr[@]}")
+}
+
+function arr_shift() {
+    arr=("$1" "${arr[@]}")
+}
+
+function arr_unshift() {
+    placeholder=${arr[0]}
+    unset arr[0]
+    arr=("${arr[@]}")
+}
+
+webget() {
+    wget --recursive --no-clobber --page-requisites --html-extension \
+        --convert-links --domains $1 --no-parent $1
+}
+
+mid() {
+    LOCATION=10
+    SCOPE=9
+    tail -n +$((${1:-$LOCATION}-${2:-$SCOPE})) ${3:-} | head -n $((${2:-$SCOPE}*2+1))
+}
+
+unbu() {
+    cp $1.backup $1
+}
+
+bu() {
+    cp $1 $1.backup
+}
+
+jr() {
+    javac ${1}.java && java $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} ${21}
+}
+
+techo() {
+    echo $1 > ${1}.txt
+}
+
+##
+# Quickly starts a webserver from the current directory.
+#
+# Thanks to:
+# http://superuser.com/questions/52483/terminal-tips-and-tricks-for-mac-os-x
+#
+# @param [optional, Integer] bind port number, default 8000
+web_serve() {
+    $(which python) -m SimpleHTTPServer ${1:-8000}
+}
+
+##
+# Returns the public/internet visible IP address of the system.
+#
+# Thanks to @mojombo's baddass tweet:
+# https://twitter.com/#!/mojombo/status/48948402955882496
+#
+whatsmy_public_ip() {
+    curl --silent 'http://jsonip.com/' | json_val '["ip"]'
+}
+
+##
+# Calculates diskusage (with du) and reports back sorted and human readable.
+#
+# Thanks to https://github.com/lucapette/dotfiles/blob/master/bash/aliases
+# for the inspiration
+#
+# @param [Array] list of files or directories to report on (file args to du)
+diskusage() {
+  du -ks "$@" | sort -nr | \
+    awk '{ \
+      if ($1 > 1048576) printf("%8.2fG", $1/1048576) ; \
+      else if ($1 > 1024) printf("%8.2fM", $1/1024) ; \
+      else printf("%8.2fK", $1) ; \
+      sub($1, "") ; print \
+    }'
+}
+
+# UNIX timestamp -> human-readable date
+timestamp2date() {
+    local ts="$1"
+    shift
+
+    date --date="@${ts}" "$@"
+}
+
+# Just date if more than week ago else 'N <timeunits> ago'
+pretty_date() {
+    local now="$(date +%s)"
+    local ts="$1"
+    local date_diff=$((now - ts))
+    if   [[ ${date_diff} -gt $((7 * 86400)) ]]; then
+        date '+%x %R' -d "@${ts}"
+    elif [[ ${date_diff} -gt 86400 ]]; then
+        echo $((date_diff / 86400)) 'days ago'
+    elif [[ ${date_diff} -gt 3600 ]]; then
+        echo $((date_diff / 3600)) 'hours ago'
+    elif [[ ${date_diff} -gt 60 ]]; then
+        echo $((date_diff / 60)) 'minutes ago'
+    elif [[ ${date_diff} -gt 0 ]]; then
+        echo 'Just now'
+    else
+        echo 'In the future'
+    fi
+}
+
+# Prints out shell running time
+shell_uptime() {
+    local secs="${SECONDS}"
+    local h=$((secs / 3600))
+    local m=$(((secs - h * 3600) / 60 ))
+    local s=$((secs % 60))
+    local -a time_comps
+    echo 'Shell is now running for' "${secs}" 'sec =' "${h}" 'h' "$(printf '%02d' ${m})" 'm' "$(printf '%02d' ${s})" 's.'
+}
+
+# Lists all functions defined in this file
+bashrc_funcs() {
+    local print_int=
+    if [ "${1,,}" = "yes" ]; then
+        print_int="yes"
+    fi
+    declare -F | while read decl; do
+        local func="${decl##* }"
+        local func_info=$($(echo "${decl}" | sed 's/-f/-F/'))
+        local source_file="${func_info##* }"
+        if [ "${source_file}" = "${BASH_SOURCE}" ]; then
+            if [ "${func::2}" != "__" ] || [ ! -z "${print_int}" ]; then
+                echo "${func}"
+            fi
+        fi
+    done
+}
+
+# Prints documenting comment for a functions defined here
+# Works with multiline comments too
+# Usage: func_help [FUNCTION NAME]
+func_help() {
+    local func="${1:-func_help}"
+    local info_code=$(declare -F "${func}" | awk '{print "local first_line=\""$2"\""; printf "local source_file=\""; for (i = 3; i < NF; i++) {printf $i" ";} printf $NF"\"";}')
+    eval "${info_code}"
+    local help_lines=0
+    while head -n $((first_line - help_lines - 1)) "${source_file}" | tail -n 1 | egrep -o '^\s*#' >/dev/null 2>/dev/null; do
+        help_lines=$((help_lines + 1))
+    done
+    if [ $((help_lines)) -gt 0 ]; then
+        echo "Help on ${func}:"
+        head -n $((first_line - 1)) "${source_file}" | tail -n $((help_lines)) | sed -E 's/^[[:space:]]*#[[:space:]]*/  /'
+        if [ "${func}" = "${FUNCNAME}" ]; then
+            echo '\n  Functions, declared in this .bashrc:'
+            bashrc_funcs | sed 's/^/    /'
+        fi
+    fi
+}
+
+diff_dotfiles() {
+    for file in *; do
+        diff "${file}" ~/"${file}"
+    done | less
+}
+
+# Copies Retina & non-Retina images at the same time
+retinacp() {
+    if [ "$#" -eq 2 ]; then
+        local srcFile="$1"
+        local retinaSrc="${srcFile%.*}@2x.${srcFile##*.}"
+        if [ -f "${retinaSrc}" ] && [ -r "${retinaSrc}" ]; then
+            local destFile="$2"
+            local retinaDest="${destFile%.*}@2x.${destFile##*.}"
+            cp "${retinaSrc}" "${retinaDest}"
+        fi
+    fi
+
+    # Default copying should be done anyway
+    cp "$@"
+}
+
+# To get some attention for background terminal
+noize() {
+    local beeps="${1:-5}"
+    local delay="${2:-0.1}"
+
+    for i in $(seq 1 "${beeps}"); do
+        echo -ne '\a'
+        sleep "${delay}"
+    done
+}
+
+httpless() {
+    http --pretty=all --print=hb "$@" | less -R;
+}
+
+#  Chrome remote console
+#-----------------------------------------------
+cr() {
+  crconsole
+
+  if [ $? -eq 1 ]; then
+    killall 'Google Chrome'
+    open -ga "Google Chrome" --args -remote-debugging-port=9222
+    sleep 1
+    crconsole
+  fi
+}
+
+#  Create a new directory and enter it
+#-----------------------------------------------
+mkd() {
+  mkdir -p "$@" && cd "$@"
+}
+
+
+#  Project root (.git dir)
+#-----------------------------------------------
+cdrt() {
+  if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    cd `git rev-parse --show-toplevel`
+  fi
+}
+
+#  Development directory
+#-----------------------------------------------
+cdd() {
+  if [ $# -gt 0 ]; then
+    cd "$HOME/Development/$1"
+  else
+    cd ~/Development
+  fi
+}
+
+compctl -f -W ~/Develop cdd
+
+#  cd to active Finder's directory
+#-----------------------------------------------
+cdf() {
+  target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
+
+  if [ "$target" != "" ]; then
+    cd "$target"
+    pwd
+  fi
+}
+
+#  Fuzzy cd-ing
+#-----------------------------------------------
+jj() {
+  if [ $1 ]; then
+    JUMPDIR=$(find . -type d -maxdepth 1 | grep $1 | tail -1)
+
+    if [[ -d $JUMPDIR && -n $JUMPDIR ]]; then
+      cd $JUMPDIR
+      pwd
+    fi
+  fi
+}
+
+
+#  Git sync
+#-----------------------------------------------
+gsy() {
+  git a && git cm "$1" && git pl && git pu
+}
+
+
+#  SSH
+#-----------------------------------------------
+sshc() {
+  cat ~/.ssh/hosts/* > ~/.ssh/config
+
+  [ $# -gt 0 ] && ssh $1
+}
+
+compctl -f -W ~/.ssh/hosts sshc
+
+#  Extractors (zsh only)
+#-----------------------------------------------
+extract() {
+  case $1 in
+    *.tar.gz|*.tgz)  tar xzvf $1;;
+    *.tar.xz)        tar Jxvf $1;;
+    *.zip)           unzip $1;;
+    *.lzh)           lha e $1;;
+    *.tar.bz2|*.tbz) tar xjvf $1;;
+    *.tar.Z)         tar zxvf $1;;
+    *.gz)            gzip -dc $1;;
+    *.bz2)           bzip2 -dc $1;;
+    *.Z)             uncompress $1;;
+    *.tar)           tar xvf $1;;
+    *.arj)           unarj $1;;
+  esac
+}
+
+
+#  Create a data URL from a file
+#-----------------------------------------------
+dataurl() {
+  local mimeType=$(file -b --mime-type "$1")
+  if [[ $mimeType == text/* ]]; then
+    mimeType="${mimeType};charset=utf-8"
+  fi
+  echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')"
+}
+
+
+#  Add reminder (OS X 10.8)
+#-----------------------------------------------
+remind() {
+  local text
+  if [ -t 0 ]; then
+    text="$1" # argument
+  else
+    text=$(cat) # pipe
+  fi
+  osascript >/dev/null <<EOF
+tell application "Reminders"
+  tell the default list
+    make new reminder with properties {name:"$text"}
+  end tell
+end tell
+EOF
+}
+
+
+#  Change network location setting
+#-----------------------------------------------
+chloc() {
+  MSG=`scselect | egrep -i "\($1" | cut -c 4- | cut -f 1 | head -n 1 | xargs scselect | sed -E 's/.+ \((.+)\)/Location changed to \1/'`
+
+  if [ "$MSG" = "" ]; then
+    growlnotify -a /System/Library/PreferencePanes/Network.prefPane -m "Unable to change location" Error
+  else
+    growlnotify -a /System/Library/PreferencePanes/Network.prefPane -m "$MSG" Location changed
+  fi
+}
+
+
+#  Use recycle bin
+#-----------------------------------------------
+TRASHDIR=~/.trash
+
+del() {
+  local path
+  for path in "$@"; do
+    # ignore any arguments
+    if [[ "$path" = -* ]]; then
+      echo "del doesn't understand any arguments. Should use /bin/rm."
+      return
+    else
+      # create trash if necessary
+      if [ ! -d $TRASHDIR ]; then
+        /bin/mkdir -p $TRASHDIR
+      fi
+
+      local dst=${path##*/}
+      # append the time if necessary
+      while [ -e $TRASHDIR"/$dst" ]; do
+        dst="$dst "$(date +%H-%M-%S)
+      done
+      /bin/mv "$path" $TRASHDIR/"$dst"
+    fi
+  done
+}
+
+#alias rm=del
+
+# empty trash
+alias trash-look="ls -al $TRASHDIR/ 2> /dev/null"
+alias trash-clean="/bin/rm -R -f $TRASHDIR/*"
+alias clean=trash-clean
+
+#  Fuzzy search & open in vim
+#-----------------------------------------------
+function agvim () {
+  vim $(ag $@ | peco --query "$LBUFFER" | awk -F : '{print "-c " $2 " " $1}')
+}
+
+# Template of function from python's urllib
+__pyurlalias_template() {
+    arg="$1"
+    local name="${arg%%=*}"
+    local func="${arg#*=}"
+
+    echo "${name}"'() {'
+    echo '  python -c "import sys, urllib; print urllib.'"${func}"' (sys.stdin.read ())" "$@"'
+    echo '}'
+}
+
+# Function generator
+__pyurlalias() {
+    local code="$(__pyurlalias_template $@)"
+    eval "${code}"
+}
+
+# Encoding & decoding URL addresses
+__pyurlalias urlencode=quote
+__pyurlalias urlencode_p=quote_plus
+__pyurlalias urldecode=unquote
+__pyurlalias urldecode_p=unquote_plus

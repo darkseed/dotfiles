@@ -1,0 +1,88 @@
+#alias ls="ls --color=auto"
+alias sl='ls'
+#alias ll="ls --color=auto -l"
+alias l='ls -lA'
+alias lst='ls -l  -ctF | head -10'
+alias ldot='ls .[a-zA-Z0-9_]*'
+alias lss='ls -s -F'
+alias lsm="ls -lat | more"
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias h=history
+alias v=vim
+alias ducks='du -cksh * | sort -rn | head -11' # list files and folders and there size
+alias daemontail='tail -f /var/log/daemon.log'
+alias messagetail='tail -f /var/log/messages'
+alias profileme="history | awk '{print \$2}' | awk 'BEGIN{FS=\"|\"}{print \$1}' | sort | uniq -c | sort -n | tail -n 20 | sort -nr"
+alias c='clear'
+alias mdate='date +"%Y%m%d"'
+alias curp='echo ${PWD##*$USER/}'
+#alias mkpatch='diff -Naur';
+
+alias py="python"
+alias pyn="nosetests"
+alias pyprof="python -m cProfile"
+
+#********** > SSH shortcuts < ***********
+alias keyon="ssh-add -t 10800"
+alias keyoff='ssh-add -D'
+alias keylist='ssh-add -l'
+alias ssh='if [ "$(ssh-add -l)" = "The agent has no identities." ]; then ssh-add; fi; /usr/bin/ssh "$@"'
+
+#********** > JOB CONTROL < ***********
+alias psc="ps auxw | grep $*"
+alias psg="ps -elf | grep $*"
+alias top3='/usr/bin/top -b -n 1 | sed -n -e "7,10p"'
+alias topf='nice -n -10 top -d.09'
+
+#********** > GIT shortcuts < ***********
+alias gt='git'
+alias gtinit='git init'
+alias gtclone='git clone'
+alias gs='git status'
+alias gc='git commit'
+alias gm='git merge'
+alias ga='git add'
+alias gaa='git add .'
+alias gpush='git push'
+alias gpull='git push'
+alias gd='git diff'
+alias gds='git diff --cached'
+alias gb='git branch'
+alias gl='git log'
+alias gsb='git show-branch'
+alias gb='git branch'
+alias gbd='git branch -d'
+alias gba='git branch -a'
+alias gco='git checkout'
+alias gg='git grep'
+alias gk='gitk --all'
+alias gr='git rebase'
+alias gri='git rebase --interactive'
+alias gcp='git cherry-pick'
+alias grm='git rm'
+alias gmv='git move'
+alias gsh='git show'
+alias gmovelastcommittostaged='gt reset --soft HEAD^'
+alias gtlog='gt log --name-status'
+alias gtlogshort='gt log --pretty=oneline'
+alias gtloggraph='gt log --graph'
+
+#********** > CONNECTIONS < ************
+alias sshr='ssh -l root $*'
+alias sshrl='sshr localhost'
+
+#********** > rsync < ***********
+alias rsyncv='rsync --progress --verbose'
+
+#********** > Navigation < ***********
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+alias ......="cd ../../../../.."
+alias .......="cd ../../../../../.."
+alias ........="cd ../../../../../../.."
+
+

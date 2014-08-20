@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if ! [ -d ~/dotfiles/.git ]; then
+  echo "Cloning repo..."
+  cd ~
+  git clone --recursive https://github.com/darkseed/dotfiles.git
+fi
+
+cd ~/dotfiles
+
+sh ./script/install
+sh ./script/dots
+sh ./script/shell
+sh ./script/font
+sh ./script/osx

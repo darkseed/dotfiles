@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "Copying dot files and directories... "
+cd ~
+
+for file in ~/dotfiles/_*; do
+  f=$(basename $file)
+  f="$HOME/${f/_/.}"
+
+  if [ ! -L "$f" ]; then
+    cp -Rf "$file" "$f"
+    echo "Copied $file --> $f"
+  fi
+done
+
+echo "ok"
