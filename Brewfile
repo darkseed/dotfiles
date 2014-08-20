@@ -1,5 +1,7 @@
 # Usage 'brew bundle Brewfile'
 
+doctor
+
 # Make sure we have the latest packages
 update
 
@@ -7,16 +9,26 @@ update
 upgrade
 
 # Add repositories
+tap caskroom/cask || true
 tap homebrew/binary || true
 tap homebrew/completions || true
 tap homebrew/python || true
 tap homebrew/science || true
 tap larsimmisch/avr || true
 
+install brew-cask
+
 install coreutils
 install moreutils
 install findutils
+install dockutil
 install gnu-sed --default-names
+
+install osxfuse
+install ext2fuse
+install ext4fuse
+
+install openvpn
 
 # Install the latest bash
 install bash
@@ -46,7 +58,17 @@ install chrome-cli
 
 # Python
 install python
+link --overwrite python
+
+cask doctor
+cask install evernote
+cask install vlc
+cask install google-chrome
+cask install google-drive
+cask install google-notifier
+cask install google-hangouts
+cask install iterm2
 
 cleanup
-
 linkapps
+prune
