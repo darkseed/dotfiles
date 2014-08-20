@@ -580,7 +580,7 @@ cdd() {
   fi
 }
 
-compctl -f -W ~/Develop cdd
+#compctl -f -W ~/Develop cdd
 
 #  cd to active Finder's directory
 #-----------------------------------------------
@@ -622,7 +622,7 @@ sshc() {
   [ $# -gt 0 ] && ssh $1
 }
 
-compctl -f -W ~/.ssh/hosts sshc
+#compctl -f -W ~/.ssh/hosts sshc
 
 #  Extractors (zsh only)
 #-----------------------------------------------
