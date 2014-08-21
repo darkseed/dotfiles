@@ -16,6 +16,7 @@ tap homebrew/python || true
 tap homebrew/science || true
 tap larsimmisch/avr || true
 
+# Install cask
 install brew-cask
 
 install coreutils

@@ -9,6 +9,15 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
+# Set default ls color schemes (source: https://github.com/seebi/dircolors-solarized/issues/10 ).
+# OSX/Linux color translations generated with http://geoff.greer.fm/lscolors/
+if $IS_OSX; then
+    export CLICOLOR=1
+    export LSCOLORS="gxfxbEaEBxxEhEhBaDaCaD"
+else
+    export LS_COLORS="di=36;40:ln=35;40:so=31;:pi=0;:ex=1;;40:bd=0;:cd=37;:su=37;:sg=0;:tw=0;:ow=0;:"
+fi
+
 export WORKON_HOME=~/virtuals
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true

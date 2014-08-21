@@ -85,4 +85,42 @@ alias ......="cd ../../../../.."
 alias .......="cd ../../../../../.."
 alias ........="cd ../../../../../../.."
 
+# Use GRC for additionnal colorization
+GRC=$(which grc)
+if [ -n GRC ]; then
+    alias colourify='$GRC -es --colour=auto'
+    alias as='colourify as'
+    #cvs
+    alias configure='colourify ./configure'
+    alias diff='colourify diff'
+    alias dig='colourify dig'
+    alias g++='colourify g++'
+    alias gas='colourify gas'
+    alias gcc='colourify gcc'
+    alias head='colourify head'
+    #alias ifconfig='colourify ifconfig'
+    #irclog
+    alias ld='colourify ld'
+    #ldap
+    #log
+    alias ls='colourify ls'
+    alias make='colourify make'
+    alias mount='colourify mount'
+    #mtr
+    alias netstat='colourify netstat'
+    alias ping='colourify ping'
+    #proftpd
+    alias ps='colourify ps'
+    alias tail='colourify tail'
+    alias traceroute='colourify traceroute'
+    #wdiff
+fi
 
+# Detect which `ls` flavor is in use
+if $IS_OSX; then
+    lsflags="-G"
+else
+    lsflags="--color --group-directories-first"
+fi
+alias ll='ls -lah ${lsflags}'
+alias ls='ls -hFp ${lsflags}'
