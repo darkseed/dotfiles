@@ -13,4 +13,7 @@ for file in ~/dotfiles/_*; do
   fi
 done
 
+# Create vim swap folder
+mkdir -p ~/.vim/tmp
+
 echo "ok"
