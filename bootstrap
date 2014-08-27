@@ -32,11 +32,11 @@ if [ "${OS}" == "mac" ]; then
 fi
 
 cd ~/dotfiles
-sh ./scripts/dots
+bash scripts/dots
 
 if [ "${OS}" == "mac" ]; then
-  sh ./scripts/install
-  sh ./scripts/shell
-  sh ./scripts/font
-  sh ./scripts/osx
+  bash scripts/install
+  bash scripts/shell
+  bash scripts/font
+  bash scripts/osx
 fi
