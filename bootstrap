@@ -1,35 +1,42 @@
 #!/bin/bash
 
+. core.sh
+
 if ! [ -d ~/dotfiles/.git ]; then
   echo "Cloning repo..."
   cd ~
   git clone --recursive https://github.com/darkseed/dotfiles.git
 fi
 
-# Install command line tools
-xcode-select -p
-if [[ $? -ne 0 ]]; then
-    xcode-select --install
+if [ "${OS}" == "mac" ]; then
+
+  # Install command line tools
+  xcode-select -p
+  if [[ $? -ne 0 ]]; then
+      xcode-select --install
+  fi
+
+  # A full installation of Xcode.app is required to compile macvim.
+  # Installing just the Command Line Tools is not sufficient.
+  xcodebuild -version
+  if [[ $? -ne 0 ]]; then
+      # TODO: find a way to install Xcode.app automatticaly
+      # See: http://stackoverflow.com/a/18244349
+
+      # Accept Xcode license
+      sudo xcodebuild -license
+  fi
+
+  # Update all OSX packages
+  sudo softwareupdate -i -a
 fi
-
-# A full installation of Xcode.app is required to compile macvim.
-# Installing just the Command Line Tools is not sufficient.
-xcodebuild -version
-if [[ $? -ne 0 ]]; then
-    # TODO: find a way to install Xcode.app automatticaly
-    # See: http://stackoverflow.com/a/18244349
-
-    # Accept Xcode license
-    sudo xcodebuild -license
-fi
-
-# Update all OSX packages
-sudo softwareupdate -i -a
 
 cd ~/dotfiles
-
-sh ./script/install
 sh ./script/dots
-sh ./script/shell
-sh ./script/font
-sh ./script/osx
+
+if [ "${OS}" == "mac" ]; then
+  sh ./script/install
+  sh ./script/shell
+  sh ./script/font
+  sh ./script/osx
+fi
