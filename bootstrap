@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. core.sh
+. _core_functions
 
 if ! [ -d ~/dotfiles/.git ]; then
   echo "Cloning repo..."
