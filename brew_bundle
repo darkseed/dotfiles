@@ -38,8 +38,8 @@ else
 fi
 
 
-sudo chown root:wheel /usr/local/Cellar/htop-osx/0.8.2.2/bin/htop
-sudo chmod u+s /usr/local/Cellar/htop-osx/0.8.2.2/bin/htop
+sudo chown root:wheel /usr/local/Cellar/htop-osx/*/bin/htop
+sudo chmod u+s /usr/local/Cellar/htop-osx/*/bin/htop
 
 sudo cp -Rf "$(brew --prefix)/opt/osxfuse/Library/Filesystems/osxfusefs.fs" /Library/Filesystems
 sudo chmod +s /Library/Filesystems/osxfusefs.fs/Support/load_osxfusefs
