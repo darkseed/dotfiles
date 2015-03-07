@@ -1,0 +1,115 @@
+#!/bin/bash
+
+PROJECT_NAME="$1"
+SCALA_VERSION=$(scala -version 2>&1|sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+if [ -z "$1" ]
+then
+  echo "usage: $0 project-name"
+  exit 1
+fi
+
+mkdir $PROJECT_NAME
+cd $PROJECT_NAME
+
+cat > build.sbt << EOF
+name := "$PROJECT_NAME"
+ 
+version := "1.0.0"
+ 
+scalaVersion := "$SCALA_VERSION"
+
+val sparkVersion = "1.2.0"
+ 
+libraryDependencies ++= Seq( 
+  // Spark & MLLib
+  //"org.apache.spark" %% "spark-core" % sparkVersion,
+  //"org.apache.spark" %% "spark-mllib" % sparkVersion,
+  // Lucene
+  //"org.apache.lucene" % "lucene-core" % "4.8.1",
+  // for Porter Stemmer
+  //"org.apache.lucene" % "lucene-analyzers-common" % "4.8.1",
+  // Guava for the dictionary
+  //"com.google.guava" % "guava" % "17.0",
+  // article extractor
+  //"com.gravity" %% "goose" % "2.1.23",
+
+  "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+  "org.mockito" % "mockito-core" % "1.10.19" % "test"
+)
+
+// used for goose
+//resolvers += Resolver.mavenLocal
+
+// TaskKey[Unit]("echo-simple") := {
+//   List("sh", "-c", "(cd src/main/; echo \"YOUPI\")") ! ;
+// }
+
+// Merge strategy shared between app & test
+
+val sharedMergeStrategy: (String => MergeStrategy) => String => MergeStrategy =
+  old => {
+    case x if x.startsWith("META-INF/ECLIPSEF.RSA") => MergeStrategy.last
+    case x if x.startsWith("META-INF/mailcap") => MergeStrategy.last
+    case x if x.endsWith("plugin.properties") => MergeStrategy.last
+    case x => old(x)
+  }
+
+// Load Assembly Settings
+
+assemblySettings
+
+// Assembly App
+
+// mainClass in assembly := Some("com.github.ezhulenev.spark.RunSparkApp")
+
+// jarName in assembly := "spark-testing-example-app.jar"
+
+mergeStrategy in assembly <<= (mergeStrategy in assembly)(sharedMergeStrategy)
+
+EOF
+
+mkdir -p project
+mkdir -p src/{test,main}/{resources,scala,java}
+
+cat > project/plugins.sbt << EOF
+logLevel := Level.Warn
+
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.11.2")
+
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")
+
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.5.0")
+EOF
+
+cat > .gitignore << EOF
+*.class
+*.log
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+
+# Eclipse specific
+.project
+.classpath
+.cache
+EOF
+
+git init
+git add .gitignore
+git add build.sbt
+git commit -m 'Initial commit'
+
+sbt update
+
+echo
+echo "Project ready for use"
+pwd
