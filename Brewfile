@@ -69,6 +69,11 @@ cask install google-drive
 cask install google-notifier
 cask install google-hangouts
 cask install iterm2
+cask install vlc
+cask install virtualbox
+cask install the-unarchiver
+cask install imageoptim
+cask install imagealpha
 
 cleanup
 linkapps
