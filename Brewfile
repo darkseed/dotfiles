@@ -56,6 +56,8 @@ install webkit2png
 install tree
 install foremost
 install chrome-cli
+install spark
+install grc
 
 # Python
 install python
