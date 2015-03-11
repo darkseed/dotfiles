@@ -9,44 +9,22 @@ fi
 # Exit if, for some reason, Homebrew is not installed.
 [[ ! "$(type -P brew)" ]] && echo "Homebrew failed to install." && return 1
 
-doctor() {
-  brew doctor
-}
-install() {
-  brew install "$@"
-}
-update() {
-  brew update
-}
-upgrade() {
-  brew upgrade
-}
-tap() {
-  brew tap "$@"
-}
-linkapps() {
-  brew linkapps
-}
-cleanup() {
-  brew cleanup
-}
-cask() {
-  brew cask "$@"
-}
-prune(){
-  brew prune
-}
-link(){
-    brew link "$@"
-}
+brew update
+brew upgrade
 
-if [ $# -gt 0 ]; then
-  source "$1"
-else
-  source ./Brewfile
-fi
+brew tap Homebrew/brewdler
 
+# Install using Brewfile
+brew brewdle
 
+# Use the brew python
+brew link --overwrite python
+
+brew cleanup
+brew linkapps
+brew prune
+
+# Reset htop suid flags
 sudo chown root:wheel /usr/local/Cellar/htop-osx/*/bin/htop
 sudo chmod u+s /usr/local/Cellar/htop-osx/*/bin/htop
 
