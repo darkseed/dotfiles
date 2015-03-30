@@ -18,20 +18,17 @@ brew 'brew-cask'
 brew 'brew-gem'
 brew 'brew-pip'
 
+# Moved up so i can work while the install runs
+cask 'google-chrome'
+cask 'iterm2'
+
 # Core utils
 brew 'coreutils'
 brew 'moreutils'
 brew 'findutils'
 brew 'dockutil'
 brew 'gnu-sed', args: ['default-names']
-
-# FUSE
-brew 'osxfuse'
-brew 'ext2fuse'
-brew 'ext4fuse'
-
-# VPN
-brew 'openvpn'
+brew 'Caskroom/cask/java'
 
 # Install the latest bash
 brew 'bash'
@@ -130,11 +127,9 @@ brew 'redis'
 # Cask apps
 cask 'evernote'
 cask 'vlc'
-cask 'google-chrome'
 cask 'google-drive'
 cask 'google-notifier'
 cask 'google-hangouts'
-cask 'iterm2'
 cask 'virtualbox'
 cask 'the-unarchiver'
 cask 'imageoptim'
