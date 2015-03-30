@@ -30,3 +30,4 @@ export GEM_HOME="$(brew --prefix)"
 export PATH=$HOME/.nodebrew/current/bin:$PATH
 export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 export PATH=$PATH:$HOME/bin
+export PATH="/usr/local/sbin:$PATH"
