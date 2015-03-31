@@ -42,7 +42,7 @@ stty susp undef
 # And start this once manually
 # ssh-agent -s | grep -v echo > $HOME/.ssh-agent
 if [[ -f ~/.ssh-agent ]]; then
-    source $HOME/.ssh-agent
+    source $HOME/.ssh-agent >/dev/null 2>&1
 fi
 
 
