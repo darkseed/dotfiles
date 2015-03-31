@@ -72,6 +72,7 @@ brew 'readline'
 brew 'sqlite'
 brew 'tree'
 brew 'x264'
+brew 'httpie'
 
 # Docker tools
 brew 'docker'
@@ -136,3 +137,4 @@ cask 'imageoptim'
 cask 'imagealpha'
 cask 'utorrent'
 cask 'skype'
+cask 'sourcetree'
