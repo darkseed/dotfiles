@@ -105,6 +105,10 @@ if ! [ -d ~/dotfiles/.git ]; then
   echo "Cloning repo..."
   cd ~
   git clone --recursive https://github.com/darkseed/dotfiles.git
+else
+  cd ~/dotfiles
+  git reset HEAD
+  git pull
 fi
 
 cd ~/dotfiles/
