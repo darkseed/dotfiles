@@ -333,6 +333,12 @@ sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.efax.plist
 # Enable secure virtual memory
 sudo defaults write /Library/Preferences/com.apple.virtualMemory UseEncryptedSwap -bool yes
 
+## Security settings
+
+# Don't default to saving documents to iCloud
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
+
 # Remove default content
 rm -rf ~/Downloads/About\ Downloads.lpdf
 
